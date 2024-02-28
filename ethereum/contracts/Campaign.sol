@@ -1,19 +1,22 @@
-pragma solidity^0.4.17;
-
+// SPDX-License-Identifier: MIT
+ 
+pragma solidity ^0.8.9;
+ 
 contract CampaignFactory {
-    address[] public depployedCampaigns;
-
-    function createCampaign(uint minimum,string name,string description,string image) public {
-        address newCampaign  = new Campaign(minimum, msg.sender, name, description, image);
-        depployedCampaigns.push(newCampaign);
+    address payable[] public deployedCampaigns;
+ 
+    function createCampaign(uint minimum,string memory name,string memory description,string memory image) public {
+        address newCampaign = address(new Campaign(minimum, msg.sender, name, description, image));
+        deployedCampaigns.push(payable(newCampaign));
     }
-    function getDeployedCampaigns() public view returns (address[]){
-        return depployedCampaigns;
+ 
+    function getDeployedCampaigns() public view returns (address payable[] memory) {
+        return deployedCampaigns;
     }
 }
-
+ 
 contract Campaign {
-    struct Request{
+    struct Request {
         string description;
         uint value;
         address recipient;
@@ -21,38 +24,34 @@ contract Campaign {
         uint approvalCount;
         mapping(address => bool) approvals;
     }
-
+ 
     Request[] public requests;
     address public manager;
     uint public minimumContribution;
     string public CampaignName;
     string public CampaignDescription;
     string public imageUrl;
-    // address[] public approvers;                  //--> arrays
-    mapping(address => bool) public approvers;      //-->mapping
+    mapping(address => bool) public approvers;
     uint public approversCount;
-
-    modifier restricted(){
+ 
+    modifier restricted() {
         require(msg.sender == manager);
         _;
     }
+ 
+    // constructor (uint minimum, address creator) {
+    //     manager = creator;
+    //     minimumContribution = minimum;
+    // }
 
-    function Campaign(uint minimum, address creator, string name,string description,string image) public {
+    constructor(uint minimum, address creator, string memory name,string memory description,string memory image) {
         manager = creator; 
         minimumContribution = minimum;
         CampaignName=name;
         CampaignDescription=description;
         imageUrl=image;
     }
-    // here payable is what makes this function able to receive some amount of money 
-    // function contribute() public payable {
-    //     require(msg.value > minimumContribution);
-
-    //     // approvers.push(msg.sender);  --> used in arrays
-    //     approvers[msg.sender] = true;       //--> jsut like javascript objects
-    //     approversCount++;
-    // }
-
+ 
     function contribute() public payable {
         require(msg.value > minimumContribution);
         if (!approvers[msg.sender]) {
@@ -60,58 +59,55 @@ contract Campaign {
             approversCount++;
             approvers[msg.sender] = true;
         }
+        // approvers[msg.sender] = true;
+        // approversCount++;
     }
-
-    function createRequest(string description, uint value, address recipient) public restricted {
-        Request memory newRequest = Request({
-            description: description,
-            value: value,
-            recipient:recipient,
-            complete: false,
-            approvalCount: 0
-        });
-
-        // Request(description, value, recipient, false);
-
-        requests.push(newRequest);
+ 
+    function createRequest(string memory description, uint value, address recipient) public restricted {
+        Request storage newRequest = requests.push(); 
+        newRequest.description = description;
+        newRequest.value= value;
+        newRequest.recipient= recipient;
+        newRequest.complete= false;
+        newRequest.approvalCount= 0;
     }
-
+ 
     function approveRequest(uint index) public {
         Request storage request = requests[index];
-
-        require(approvers[msg.sender]);     // -->should have contributed
-        require(!request.approvals[msg.sender]);       //--> approving for 1 time only 
-
+ 
+        require(approvers[msg.sender]);         // -->should have contributed
+        require(!request.approvals[msg.sender]);        //--> approving for 1 time only 
+ 
         request.approvals[msg.sender] = true;
         request.approvalCount++;
     }
-
+ 
     function finalizeRequest(uint index) public restricted {
-        Request storage request =requests[index];
+        Request storage request = requests[index];
+ 
         require(!request.complete);
-        require(request.approvalCount >(approversCount/2));
-
-        request.recipient.transfer(request.value);
+        require(request.approvalCount > (approversCount / 2));
+ 
+        payable(request.recipient).transfer(request.value);
         request.complete = true;
     }
-
+    
     function getSummary() public view returns (
-        uint, uint, uint, uint, address, string, string, string
-        )
-    {
+      uint, uint, uint, uint, address, string memory, string memory, string memory
+      ) {
         return (
-            minimumContribution,
-            this.balance,
-            requests.length,
-            approversCount,
-            manager,
-            CampaignName,
-            CampaignDescription,
-            imageUrl
+          minimumContribution,
+          address(this).balance,
+          requests.length,
+          approversCount,
+          manager,
+          CampaignName,
+          CampaignDescription,
+          imageUrl
         );
     }
-
-    function getRequestCount() public view returns (uint) {
+    
+    function getRequestsCount() public view returns (uint) {
         return requests.length;
     }
 }
