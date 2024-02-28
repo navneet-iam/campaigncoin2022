@@ -3,8 +3,8 @@ const { Web3 } = require("web3");
 const compiledFactory = require("./build/CampaignFactory.json");
  
 const provider = new HDWalletProvider(
-  'cat taste extra connect ceiling depth issue post void panda scheme crazy',
-    'https://rinkeby.infura.io/v3/4e0c0f78dbcb4e01ad75d2a93d5f4911'
+  'MNEMONIC HERE',
+    'INFURA LINK HERE'
 );
 const web3 = new Web3(provider);
  
