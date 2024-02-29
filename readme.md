@@ -1,4 +1,7 @@
-The website is not working now because the rinkeby test network is deprecated on Oct 5th, 2022. So we are working on it, here are some screenshots of website:
+CampaignCoin is a decentralized web application that leverages blockchain technology to provide funding for campaigns or start-ups. The permissionless nature of the platform empowers individuals to create and contribute to campaigns without the need for intermediaries. Through its trustless and decentralized nature, CampaignCoin ensures that all contributed funds are securely stored in a smart contract, free from the risks associated with traditional central servers. By utilizing blockchain's immutable ledger, CampaignCoin offers transparency in fund allocation, allowing contributors to track the flow of funds with ease. 
+
+The campaign creator must submit a spending request for any transaction, which will transfer the funds directly to the vendor's account from the smart contract. This transaction will only proceed if more than 50% of the contributors approve the spending request. This setup empowers contributors to retain decision-making power even after contributing their funds.
+
 ![image](https://user-images.githubusercontent.com/91687386/198102737-69a144ec-4824-40f3-a835-460b1c860849.png)
 The user have to set up metamask first in google extension and login to the website. In the home page, user can see open campaigns.
 
